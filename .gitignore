@@ -1,0 +1,8 @@
+*.pyc
+*.pyo
+pip-selfcheck.json
+*.swp
+bin
+local
+lib
+include
