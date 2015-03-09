@@ -16,6 +16,9 @@ class FastQLearningPlayer(QLearningPlayer):
     def _equivalent_states(self, state, action):
         for i in range(4):
             yield state, action
+            # interestingly, this is also bad
+            # yield self._mirror(state, action)
+
             state, action = self._rotate_90_clockwise(state, action)
             
     def _rotate_90_clockwise(self, state, action):
@@ -30,6 +33,21 @@ class FastQLearningPlayer(QLearningPlayer):
                  state[7] + state[4] + state[1] + 
                  state[8] + state[5] + state[2])
         action = [2, 5, 8, 1, 4, 7, 0, 3, 6][action]
+
+        return state, action
+
+    def _mirror(self, state, action):
+        """
+        Horizontally mirrors the given state-action pair.
+
+        012       210
+        345  -->  543
+        678       876
+        """
+        state = (state[2] + state[1] + state[0] +
+                 state[5] + state[4] + state[3] +
+                 state[8] + state[7] + state[6])
+        action = [2, 1, 0, 5, 4, 3, 8, 7, 6][action]
 
         return state, action
 

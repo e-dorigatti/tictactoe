@@ -2,6 +2,12 @@ from baseplayer import player, BasePlayer
 
 @player
 class HumanPlayer(BasePlayer):
+    def __init__(self, name, referee, *args, **kwargs):
+        super(HumanPlayer, self).__init__(name, referee, *args, **kwargs)
+        if referee:
+            self.referee = referee
+            referee.subscribe('on_match_end', self.match_ended)
+
     def get_move(self, ttt):
         state = [ str(i) if x == '-' else x for i, x in enumerate(ttt.state) ]
         print ' '.join(state[0:3])
@@ -20,3 +26,12 @@ class HumanPlayer(BasePlayer):
                 print 'Ivalid move'
 
         return int(move)
+
+    def match_ended(self, winner, ttt, *args, **kwargs):
+        if winner == self.name:
+            print 'You won!\n'
+        elif winner == 'draw':
+            print 'Tie...\n'
+        else:
+            print 'You lost :(\n'
+        raw_input('Press enter to continue...')
