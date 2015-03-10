@@ -19,9 +19,9 @@ class MinimaxPlayer(BasePlayer):
         winner = ttt.winner(state)
 
         if winner == self.name:
-            return 10 - depth, None
+            return 10 - depth, None  # try to win as soon as possible
         elif winner == opponent:
-            return depth - 10, None
+            return depth - 10, None  # try to lose as late as possible
         elif winner == 'draw':
             return 0, None
 

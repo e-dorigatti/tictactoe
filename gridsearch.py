@@ -3,6 +3,7 @@ from players import QLearningPlayer
 import players
 import sys
 
+#http://stackoverflow.com/questions/23916413/celery-parallel-distributed-task-with-multiprocessing
 
 def _grid_generator(grid_spec):
     """

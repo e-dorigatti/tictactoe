@@ -1,5 +1,4 @@
 from tictactoe import TicTacToe
-import random
 
 
 class Referee(object):
@@ -28,7 +27,7 @@ class Referee(object):
 
     def start_game(self, player_x, player_o):
         self.ttt = TicTacToe()
-        random.shuffle(self.play_order) # avoid facilitating the first moving player
+        self.play_order = self.play_order[::-1]  # avoid facilitating the first moving player
         self.turn = 0
 
         self.players = {
