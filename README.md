@@ -2,7 +2,13 @@ TicTacToe
 ===
 A couple of AI algorithms to play the tic tac toe game. You can play as well!
 
-## Content of repo
+Sections:
+ - [Content of Repository](#content-of-repository)
+ - [Players Comparison](#players-comparison)
+ - [Parameters Selection](#parameters-selection)
+ - [About Learning Rate](#about-learning-rate)
+
+## Content of Repository
 The algorithms are implemented in the players folder, here you will find:
  - **MinimaxPlayer**: Implementation of the popular [minimax algorithm](http://en.wikipedia.org/wiki/Minimax),
  which is basically a sistematic exploration of the tree whose nodes are game states and the children of a node
@@ -35,8 +41,9 @@ Additionally, you will find these scripts:
   a match starts and when it ends.
  - **matches.py**: Utilities for playing high number of matches and even tournaments.
  
-## Player Comparison
-Let's see how players play!
+## Players Comparison
+Let's see how players play! The parameters used for the `QLearningPlayer` and its faster version are discount factor
+= 0.1, exploration coefficient = 0.2 and learning rate coefficient = 0.00001 (chosed mostly by heart, more on this later).
 
  - `python play.py -p --count 75000 --step 500 QLearningPlayer QLearningPlayer`
  ![](https://cloud.githubusercontent.com/assets/5585926/6541288/eecacb1c-c4c7-11e4-977c-ab5bf2f324f2.png)
@@ -73,7 +80,7 @@ Let's see how players play!
  confirms once again the perfection of the `MinimaxPlayer`.
 
 
-## Parameter selection
+## Parameter Selection
 As previously mentioned, Q-learning needs two parameters which determine how learning actually happens and the
 `QLearningPlayer` needs another parameter to determine how keen the player is about exploring new states and
 strategies. Together, these parameters determine the agent's character but then one question arises: which are
@@ -183,3 +190,50 @@ better strategy and outplay its opponent (unless the game lasts enough and both 
 Why, then, `0.0001` performs significantly better than `0.0` (there is an 8% difference in the scores)? Generally, a decreasing learning
 rate is required for a learning algorithm to converge to the optimal solution (I do not know specifically about Q-learning, but 
 this is especially important for gradient descent-based learning algorithms).
+
+And, finally, which is the best discount factor? By looking at previous attempts the best players always had a discount factor of 1
+or close to it, so it seems reasonable to try with high values:
+
+```
+$ python gridsearch.py 50000 0.5,0.625,0.75,0.875,1 0.001,0.0001 0.0001
+Expected number of matches: 4500000 (ca. 7 minutes at 10000m/s)
+INFO: played 4500000 matches in 1449.54 seconds (3104.43 m/s)
+
+*** Final Normalized Ranking (50000 matches per game) ***
+1) 1.00 (1292911 points) -- QLearningPlayer, (1.0, 0.0001, 0.0001)
+2) 0.97 (1250488 points) -- QLearningPlayer, (0.875, 0.0001, 0.0001)
+3) 0.94 (1211274 points) -- QLearningPlayer, (0.75, 0.0001, 0.0001)
+4) 0.90 (1162872 points) -- QLearningPlayer, (1.0, 0.001, 0.0001)
+5) 0.88 (1133502 points) -- QLearningPlayer, (0.625, 0.0001, 0.0001)
+6) 0.86 (1108459 points) -- QLearningPlayer, (0.875, 0.001, 0.0001)
+7) 0.80 (1030444 points) -- QLearningPlayer, (0.5, 0.0001, 0.0001)
+8) 0.78 (1009810 points) -- QLearningPlayer, (0.75, 0.001, 0.0001)
+9) 0.71 (924121 points) -- QLearningPlayer, (0.625, 0.001, 0.0001)
+10) 0.66 (851847 points) -- QLearningPlayer, (0.5, 0.001, 0.0001)
+```
+
+Good, so the optimal combination of parameters appears to be discount factor = 0.1, exploration coefficient = 0.0001 and learning rate
+coefficient = 0.0001. 
+
+## About Learning Rate
+If you now plug in these parameters into two `QLearningPlayer`'s and let them play together you will notice a
+very weird and surprising pattern:
+
+![](https://cloud.githubusercontent.com/assets/5585926/6705748/2e5d56d0-cd58-11e4-83ca-5ba1105dabb1.png)
+
+Things went as expected until about match 40000, at that point there was a steep increase in the number of victories of both players followed
+by fluctuations during matches 70000 to 80000. After that, victories and ties sort of flattened out at around 30% each. What's most creepy
+about this figure is that it constantly replicates. I suspect this is related to the learning rate coefficient because it wasn't really tuned
+in the previous investigations. Notice that `exp(40000 * -0.0001) = 0.0183` and `exp(-75000 * 0.0001) = 0.00055`, this makes me think that a
+new ground breaking strategy came out around match 40000 and that players couldn't adapt to it quickly enough. Let's try to go back to the
+previous learning rate coefficient of `0.00001`
+
+![](https://cloud.githubusercontent.com/assets/5585926/6705745/2e5abb78-cd58-11e4-881f-0a2dda27b288.png)
+
+Phew! By playing around with the learning rate coefficient you will notice how, when it is way too high plots appear like random lines and
+as soon as you approach the optimal learning rate a clear breaking point shows up and moves forward in time. But a picture's worth a
+thousand words (`QLearningPlayer` as X vs `MinimaxPlayer` as O)
+
+![](https://cloud.githubusercontent.com/assets/5585926/6705746/2e5ca2bc-cd58-11e4-99fc-58a14146ebf6.png)
+
+(you can replicate this using `python experiments.py cur`).

@@ -6,8 +6,8 @@ from math import exp
 
 @player
 class QLearningPlayer(BasePlayer):
-    def __init__(self, name, referee=None, discount=0.1,
-                 exploration_coeff=0.2, lrate_coeff=0.00001):
+    def __init__(self, name, referee=None, discount=1.0,
+                 exploration_coeff=0.0001, lrate_coeff=0.00001):
         super(QLearningPlayer, self).__init__(name, referee)
 
         if referee:

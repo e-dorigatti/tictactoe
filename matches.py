@@ -1,5 +1,6 @@
 import multiprocessing as mp
 from referee import Referee
+import matplotlib.pyplot as plt
 import players
 import time
 import sys
@@ -16,7 +17,8 @@ def play_matches(referee, player_x, player_o, step, count):
         i += 1
 
         if i % step == 0:
-            yield victories
+            yield dict(victories)   # we give a copy of this dict, otherwise
+                                    # obscure things could happen...
 
 
 def play_tournament(count_per_game, players, worker_count=None):
@@ -60,3 +62,12 @@ def _compare_players(args):
     score_o = 3 * victories['o'] + victories['draw']
     
     return ((class_x, param_x), score_x), ((class_o, param_o), score_o)
+
+
+def plot_plot(victories, step, title):
+    plt.title(title)
+    plt.plot([x['i'] for x in victories], [x['draw'] for x in victories], label='Ties')
+    plt.plot([x['i'] for x in victories], [x['x'] for x in victories], label='X')
+    plt.plot([x['i'] for x in victories], [x['o'] for x in victories], label='O')
+    plt.ylim(ymax=step+10); plt.grid(True); plt.legend(loc='lower right') 
+

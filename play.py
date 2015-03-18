@@ -1,17 +1,8 @@
 from referee import Referee
-from matches import play_matches
 import matplotlib.pyplot as plt
+from matches import play_matches, plot_plot
 import click
 import players
-
-
-def plot_plot(victories, step, player_x, player_o):
-    plt.title('%s as X vs. %s as O' % (player_x, player_o))
-    plt.plot([x['i'] for x in victories], [x['draw'] for x in victories], label='Ties')
-    plt.plot([x['i'] for x in victories], [x['x'] for x in victories], label='X')
-    plt.plot([x['i'] for x in victories], [x['o'] for x in victories], label='O')
-    plt.ylim(ymax=step+10); plt.grid(True); plt.legend(loc='lower right') 
-    plt.show()
 
 
 @click.command(help='Let two players of the given classes play together. '
@@ -37,12 +28,14 @@ def cli(player_x, player_o, step, count, plot):
         partial = { k: v - prev[k] for k, v in results.iteritems() }
         partial['i'] = i * step
         partials.append(partial)
+        prev = results
 
         print ','.join(str(x) for x in partial.values())
-        prev = dict(results)    # need to get a copy of results
 
     if plot:
-        plot_plot(partials, step, player_x, player_o)
+        title = '%s as X vs. %s as O' % (player_x, player_o)
+        plot_plot(partials, step, title)
+        plt.show()
 
 if __name__ == '__main__':
     cli()
