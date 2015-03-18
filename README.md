@@ -80,7 +80,7 @@ Let's see how players play! The parameters used for the `QLearningPlayer` and it
  confirms once again the perfection of the `MinimaxPlayer`.
 
 
-## Parameter Selection
+## Parameters Selection
 As previously mentioned, Q-learning needs two parameters which determine how learning actually happens and the
 `QLearningPlayer` needs another parameter to determine how keen the player is about exploring new states and
 strategies. Together, these parameters determine the agent's character but then one question arises: which are
@@ -212,7 +212,7 @@ INFO: played 4500000 matches in 1449.54 seconds (3104.43 m/s)
 10) 0.66 (851847 points) -- QLearningPlayer, (0.5, 0.001, 0.0001)
 ```
 
-Good, so the optimal combination of parameters appears to be discount factor = 0.1, exploration coefficient = 0.0001 and learning rate
+Good, so the optimal combination of parameters appears to be discount factor = 1.0, exploration coefficient = 0.0001 and learning rate
 coefficient = 0.0001. 
 
 ## About Learning Rate
