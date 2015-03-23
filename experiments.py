@@ -1,9 +1,11 @@
 from matches import play_matches, Referee, plot_plot
 import matplotlib.pyplot as plt
 import multiprocessing as mp
+import pandas as pd
 import players
 import time
 import sys
+import math
 
 
 experiments = dict()
@@ -79,33 +81,56 @@ def side_invert():
 
 
 @experiment
-def learning_curves():
+def learning_curves(*args):
     """
     Shows how the match history of a QLearningPlayer vs a MinimaxPlayer
     varies as the learning rate coefficient of the former varies.
+
+    Specify learning rates coefficients as parameters
     """
 
-    step = 250
-    count = 100000
-    for subplot, lrate_c in enumerate([0.0025, 0.001, 0.00025, 0.0001]):
-        print '\nlearning rate', lrate_c
-        referee = Referee()
-        px = players.QLearningPlayer('x', referee, lrate_coeff=lrate_c)
-        po = players.MinimaxPlayer('o', referee)
+    lrates = [float(x) for x in args]
+    assert lrates, 'Specity learning rates as parameters'
+    subplots_y = math.ceil(math.sqrt(len(lrates)))
+    subplots_x = (subplots_y - 1 if subplots_y * (subplots_y - 1) > len(lrates) 
+                                 else subplots_y)
 
-        prev = { 'i': 0, 'x': 0, 'draw': 0, 'o': 0 }
-        partials = list()
-        for i, results in enumerate(play_matches(referee, px, po, step, count)):
-            partial = { k: v - prev[k] for k, v in results.iteritems() }
-            partial['i'] = i * step
-            partials.append(partial)
-            prev = results
-            sys.stderr.write('.')
+    step, count = 250, 100000
 
-        plt.subplot(2, 2, subplot + 1)
-        plot_plot(partials, step, 'Learning Rate Coefficient %f' % lrate_c)
+    pool = mp.Pool()
+    results = pool.imap(_learning_curves_parallel,
+                       ((i + 1, lrate_c, step, count) for i, lrate_c in enumerate(lrates)))
+    for subplot, lrate_c, partials in results:
+        plt.subplot(subplots_x, subplots_y, subplot)
+        df = pd.DataFrame(data=(x.values() for x in partials), columns=partials[0].keys())
+        plt.title('Learning rate coeff.: %f' % lrate_c)
+        df['draw'].plot(x=df['i'])
+        df['o'].plot(x=df['i'])
+        df['states_visited'].plot(x=df['i'], secondary_y=True)
 
+    plt.subplots_adjust(left=0.05, bottom=0.05, right=0.95, top=0.95)
     plt.show()
+
+
+def _learning_curves_parallel(args):
+    subplot, lrate_c, step, count = args
+
+    referee = Referee()
+    px = players.QLearningPlayer('x', referee, lrate_coeff=lrate_c)
+    po = players.MinimaxPlayer('o', referee)
+
+    prev = { 'i': 0, 'x': 0, 'draw': 0, 'o': 0, 'lr': 0.0 }
+    partials = list()
+    for i, results in enumerate(play_matches(referee, px, po, step, count)):
+        partial = { k: v - prev[k] for k, v in results.iteritems() }
+        partial['i'] = i * step
+        partial.update(px.debug_info())
+
+        partials.append(partial)
+        prev = results
+        sys.stderr.write(str(subplot))
+
+    return subplot, lrate_c, partials
 
 
 if __name__ == '__main__':

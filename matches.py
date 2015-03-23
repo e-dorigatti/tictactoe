@@ -64,10 +64,9 @@ def _compare_players(args):
     return ((class_x, param_x), score_x), ((class_o, param_o), score_o)
 
 
-def plot_plot(victories, step, title):
+def plot_plot(victories, step, title=''):
     plt.title(title)
     plt.plot([x['i'] for x in victories], [x['draw'] for x in victories], label='Ties')
     plt.plot([x['i'] for x in victories], [x['x'] for x in victories], label='X')
     plt.plot([x['i'] for x in victories], [x['o'] for x in victories], label='O')
-    plt.ylim(ymax=step+10); plt.grid(True); plt.legend(loc='lower right') 
-
+    plt.grid(True); plt.legend(loc='lower right'); plt.ylim(ymax=step + 10)

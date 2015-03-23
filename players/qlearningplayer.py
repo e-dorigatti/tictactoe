@@ -84,3 +84,15 @@ class QLearningPlayer(BasePlayer):
         """
         return (quality + exp(-self.exploration_coeff * self.visited[ttt.state][action]))
 
+    def debug_info(self):
+        """
+        Returns some (hopefully useful) metrics as a dict
+        """
+
+        state_action_pairs_num = sum(len(x) for x in self.visited)
+        visited_sum = sum(sum(v.values()) for k, v in self.visited.iteritems())
+
+        return {
+            'avg_visited':  float(visited_sum) / state_action_pairs_num,
+            'states_visited': len(self.visited),
+        }

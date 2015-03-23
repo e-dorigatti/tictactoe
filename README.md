@@ -230,10 +230,19 @@ previous learning rate coefficient of `0.00001`
 
 ![](https://cloud.githubusercontent.com/assets/5585926/6705745/2e5abb78-cd58-11e4-881f-0a2dda27b288.png)
 
-Phew! By playing around with the learning rate coefficient you will notice how, when it is way too high plots appear like random lines and
-as soon as you approach the optimal learning rate a clear breaking point shows up and moves forward in time. But a picture's worth a
-thousand words (`QLearningPlayer` as X vs `MinimaxPlayer` as O)
+Looks good! By playing around with the learning rate coefficient a very curious trend appears. On the left axis: ties (blue) and `MinimaxPlayer`'s
+victories (green); on the right axis: number of states visited by `QLearningPlayer`.
 
-![](https://cloud.githubusercontent.com/assets/5585926/6705746/2e5ca2bc-cd58-11e4-99fc-58a14146ebf6.png)
+![](https://cloud.githubusercontent.com/assets/5585926/6782423/7039ee54-d174-11e4-9fa5-7c948a2376ba.png)
 
-(you can replicate this using `python experiments.py cur`).
+A friend of mine, while playing agains the `MinimaxPlayer` (she never won by the way) told me that it is boring because the moves performed by
+the computer are always the same. Inspired by this, I changed the algorithm such that it choses a random action amongst the optimal ones. Look how
+the previous plot changes with this, seemingly simple, variation! (Same legend as before)
+
+![](https://cloud.githubusercontent.com/assets/5585926/6782424/703aaf9c-d174-11e4-85b3-5a7b0cfe852b.png)
+
+As learning rate varies, there is a shift in the shape of the learning curve, but the shape itself is different. Also note how the number of visited
+states is *a lot* higher in the latter case. This is to be expected, but the change of shape is totally astonishing, can you guess what is the reason
+for the "breaking point" appearing in the first case
+
+(you can replicate this using `python experiments.py cur 0.01 0.005 0.0025 0.001 0.0005 0.00025 0.0001 0.00005 0.000025`).
